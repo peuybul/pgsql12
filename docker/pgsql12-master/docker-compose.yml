@@ -1,0 +1,43 @@
+version: '3.9'
+services:
+    pgsql:
+        image: 'pgsql:12.5.DB'
+        hostname: 'pgsql12-master'
+        build:
+            context: '.'
+        restart: always
+        ports:
+            - 5432:5432
+            - 6622:6622
+        volumes:
+            - ./storage:/var/lib/pgsql
+            - /sys/fs/cgroup:/sys/fs/cgroup:ro
+        privileged: true
+        cap_add:
+            - SYS_ADMIN
+#        security_opt:
+#            - seccomp:unconfined
+        container_name: pgsql12-master
+        networks:
+            vlan:
+        deploy:
+#          mode: replicated
+#            replicas: 2
+#          resources:
+#            limits:
+#              cpus: '1.0'
+#              memory: 512M
+#            reservations:
+#              memory: 128M
+          restart_policy:
+            condition: on-failure
+            max_attempts: 5
+networks:
+  vlan:
+    driver: bridge
+    ipam:
+      driver: default
+#      config:
+#        - subnet: 10.10.10.0/24
+#          gateway: 10.10.10.1
+
